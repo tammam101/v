@@ -1,45 +1,57 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="utf-8">
-  <title>WebAR — ArUco ثابت</title>
+  <meta charset="utf-8" />
+  <title>AR Minimal</title>
+  <!-- مكتبات -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.4/aframe/build/aframe-ar.min.js"></script>
-  <style>
-    html,body{margin:0;height:100%;overflow:hidden;background:#000}
-    .a-loader,.a-loader-title{display:none!important}
-  </style>
+  <style>body{margin:0;overflow:hidden}</style>
 </head>
 <body>
-  <a-scene embedded loading-screen="enabled:false" vr-mode-ui="enabled:false"
-           renderer="alpha:true;antialias:true;logarithmicDepthBuffer:true"
-           arjs="sourceType:webcam;facingMode:environment;detectionMode:mono;debugUIEnabled:false">
-    <a-assets timeout="60000">
-      <a-asset-item id="glb" src="3d-1.glb"></a-asset-item>
+  <!-- مشهد AR: الكاميرا تشتغل، وماكو UI إضافي -->
+  <a-scene embedded vr-mode-ui="enabled: false"
+           arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;">
+    <!-- حمّل الموديل -->
+    <a-assets>
+      <!-- بدّل الاسم إذا موديلك غير -->
+      <a-asset-item id="glb" src="model.glb"></a-asset-item>
     </a-assets>
 
-    <!-- ماركر ArUco/Barcode رقم 5 (عدّل الحجم الحقيقي إن تحب: بالمتر) -->
-    <a-marker id="marker" type="barcode" value="5" size="0.16"
-              emitevents="true" hide-on-lost="false"
-              smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
-      <!-- الموديل: على يمين الماركر وبحجم أكبر -->
+    <!-- الماركر/QR: الأطفال يختفون تلقائياً عند فقدانه (السلوك الافتراضي) -->
+    <!-- غيّر مسار marker.patt إذا بمجلد آخر -->
+    <a-marker type="pattern" url="marker.patt" emitevents="true">
+      <!-- ===== إعدادات التخصيص السريعة =====
+           position: X Y Z   (الموقع)
+           rotation: X Y Z   (الدوران بالدرجات)
+           scale:    X Y Z   (الحجم)
+           ملاحظة: إذا الموديل ظاهر "نايم"، جرّب تدوّر X بـ -90 أو +90
+      -->
       <a-entity id="model"
                 gltf-model="#glb"
-                position="0.65 0 0"
-                rotation="0 0 0"
-                scale="1.35 1.35 1.35"
+                position="0 0 0"
+                rotation="-90 180 0"   <!-- غيّرها إذا طالع نايم -->
+                scale="0.2 0.2 0.2"    <!-- كبّر/صغّر -->
+                class="clickable"
                 animation-mixer>
       </a-entity>
     </a-marker>
 
+    <!-- كاميرا -->
     <a-entity camera></a-entity>
   </a-scene>
 
+  <!-- تفاعل: افتح رابط عند الضغط على الموديل -->
   <script>
-    window.addEventListener('camera-init', ()=>console.log('✅ camera-init'));
-    window.addEventListener('camera-error', (e)=>{
-      alert('⚠️ تعذّر تشغيل الكاميرا.\nتأكد من الإذن وHTTPS وافتح الرابط في Safari/Chrome (مو متصفح داخل التطبيقات).');
-      console.error(e);
+    document.addEventListener("DOMContentLoaded", function () {
+      const model = document.querySelector("#model");
+      // بدّل الرابط حسب رغبتك
+      const link = "https://www.instagram.com/your_username";
+
+      // تأكد أن اللمس يشتغل على الموبايل والمتصفح يدعم الأحداث
+      model.addEventListener("click", () => {
+        window.open(link, "_blank");
+      });
     });
   </script>
 </body>
